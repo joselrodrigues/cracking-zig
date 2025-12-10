@@ -87,11 +87,11 @@ fn detectEditor() []const u8 {
 
 fn buildEditorArgs(allocator: std.mem.Allocator, editor: []const u8, readme: []const u8, zig_file: []const u8) ![]const []const u8 {
     if (std.mem.eql(u8, editor, "nvim") or std.mem.eql(u8, editor, "vim")) {
-        var args = try allocator.alloc([]const u8, 3);
+        var args = try allocator.alloc([]const u8, 4);
         args[0] = try allocator.dupe(u8, editor);
         args[1] = try allocator.dupe(u8, "-O");
-        const files = try std.fmt.allocPrint(allocator, "{s} {s}", .{ readme, zig_file });
-        args[2] = files;
+        args[2] = try allocator.dupe(u8, readme);
+        args[3] = try allocator.dupe(u8, zig_file);
         return args;
     } else if (std.mem.eql(u8, editor, "code") or std.mem.indexOf(u8, editor, "vscode") != null) {
         var args = try allocator.alloc([]const u8, 4);

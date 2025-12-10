@@ -26,7 +26,7 @@ pub fn run(allocator: std.mem.Allocator, problem_query: ?[]const u8) !void {
             var progress = try progress_module.loadProgress(allocator);
             defer progress.deinit(allocator);
 
-            try progress_module.setStatus(&progress, allocator, problem.id, .completed);
+            try progress_module.markCompleted(&progress, allocator, problem.id, test_result.success);
             try progress_module.saveProgress(&progress, allocator);
 
             try std.fs.File.stdout().writeAll("Problem marked as completed!\n");

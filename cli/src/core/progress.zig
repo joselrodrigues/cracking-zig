@@ -194,6 +194,18 @@ pub fn setStatus(
     }
 }
 
+pub fn markCompleted(
+    progress: *Progress,
+    allocator: std.mem.Allocator,
+    problem_id: []const u8,
+    tests_passed: bool,
+) !void {
+    if (!tests_passed) {
+        return error.CannotMarkCompletedTestsFailed;
+    }
+    try setStatus(progress, allocator, problem_id, .completed);
+}
+
 fn getCurrentTimestamp(allocator: std.mem.Allocator) ![]const u8 {
     return try allocator.dupe(u8, "2025-01-01T00:00:00Z");
 }

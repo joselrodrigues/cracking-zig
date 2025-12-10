@@ -2,6 +2,7 @@ const std = @import("std");
 const list = @import("commands/list.zig");
 const start = @import("commands/start.zig");
 const test_cmd = @import("commands/test.zig");
+const tui_cmd = @import("commands/tui.zig");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -29,6 +30,8 @@ pub fn main() !void {
     } else if (std.mem.eql(u8, command, "test")) {
         const problem_query = if (args.len >= 3) args[2] else null;
         try test_cmd.run(allocator, problem_query);
+    } else if (std.mem.eql(u8, command, "tui")) {
+        try tui_cmd.run(allocator);
     } else if (std.mem.eql(u8, command, "--help") or std.mem.eql(u8, command, "-h")) {
         try printHelp();
     } else {
@@ -48,12 +51,14 @@ fn printHelp() !void {
         \\  list              List all problems with status
         \\  start <problem>   Open problem in editor
         \\  test [problem]    Run tests for problem
+        \\  tui               Interactive terminal interface
         \\  --help, -h        Show this help message
         \\
         \\Examples:
         \\  cz list
         \\  cz start 01_pair_sum
         \\  cz test
+        \\  cz tui
         \\
     );
 }

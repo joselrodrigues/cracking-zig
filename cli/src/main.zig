@@ -1,5 +1,6 @@
 const std = @import("std");
 const list = @import("commands/list.zig");
+const start = @import("commands/start.zig");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -19,7 +20,11 @@ pub fn main() !void {
     if (std.mem.eql(u8, command, "list")) {
         try list.run(allocator);
     } else if (std.mem.eql(u8, command, "start")) {
-        std.debug.print("TODO: implement start command\n", .{});
+        if (args.len < 3) {
+            try std.fs.File.stderr().writeAll("Error: start command requires a problem name\n");
+            std.process.exit(1);
+        }
+        try start.run(allocator, args[2]);
     } else if (std.mem.eql(u8, command, "test")) {
         std.debug.print("TODO: implement test command\n", .{});
     } else if (std.mem.eql(u8, command, "--help") or std.mem.eql(u8, command, "-h")) {

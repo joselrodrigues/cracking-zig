@@ -115,45 +115,45 @@ pub fn saveProgress(progress: *const Progress, allocator: std.mem.Allocator) !vo
     const file = try std.fs.cwd().createFile(progress_path, .{});
     defer file.close();
 
-    var buffer = std.ArrayList(u8).init(allocator);
-    defer buffer.deinit();
+    var buffer: std.ArrayList(u8) = .empty;
+    defer buffer.deinit(allocator);
 
-    const writer = buffer.writer();
-
-    try writer.writeAll("{\n  \"version\": \"");
-    try writer.writeAll(progress.version);
-    try writer.writeAll("\",\n  \"problems\": {\n");
+    try buffer.appendSlice(allocator, "{\n  \"version\": \"");
+    try buffer.appendSlice(allocator, progress.version);
+    try buffer.appendSlice(allocator, "\",\n  \"problems\": {\n");
 
     var it = progress.problems.iterator();
     var first = true;
     while (it.next()) |entry| {
         if (!first) {
-            try writer.writeAll(",\n");
+            try buffer.appendSlice(allocator, ",\n");
         }
         first = false;
 
-        try writer.writeAll("    \"");
-        try writer.writeAll(entry.key_ptr.*);
-        try writer.writeAll("\": {\n");
+        try buffer.appendSlice(allocator, "    \"");
+        try buffer.appendSlice(allocator, entry.key_ptr.*);
+        try buffer.appendSlice(allocator, "\": {\n");
 
-        try writer.writeAll("      \"status\": \"");
-        try writer.writeAll(statusToString(entry.value_ptr.*.status));
-        try writer.writeAll("\",\n");
+        try buffer.appendSlice(allocator, "      \"status\": \"");
+        try buffer.appendSlice(allocator, statusToString(entry.value_ptr.*.status));
+        try buffer.appendSlice(allocator, "\",\n");
 
-        try writer.writeAll("      \"last_attempt\": \"");
-        try writer.writeAll(entry.value_ptr.*.last_attempt);
-        try writer.writeAll("\",\n");
+        try buffer.appendSlice(allocator, "      \"last_attempt\": \"");
+        try buffer.appendSlice(allocator, entry.value_ptr.*.last_attempt);
+        try buffer.appendSlice(allocator, "\",\n");
 
-        try writer.print("      \"attempts\": {},\n", .{entry.value_ptr.*.attempts});
+        const attempts_str = try std.fmt.allocPrint(allocator, "      \"attempts\": {},\n", .{entry.value_ptr.*.attempts});
+        defer allocator.free(attempts_str);
+        try buffer.appendSlice(allocator, attempts_str);
 
-        try writer.writeAll("      \"notes\": \"");
-        try writer.writeAll(entry.value_ptr.*.notes);
-        try writer.writeAll("\"\n");
+        try buffer.appendSlice(allocator, "      \"notes\": \"");
+        try buffer.appendSlice(allocator, entry.value_ptr.*.notes);
+        try buffer.appendSlice(allocator, "\"\n");
 
-        try writer.writeAll("    }");
+        try buffer.appendSlice(allocator, "    }");
     }
 
-    try writer.writeAll("\n  }\n}\n");
+    try buffer.appendSlice(allocator, "\n  }\n}\n");
 
     try file.writeAll(buffer.items);
 }

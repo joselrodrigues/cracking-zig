@@ -1,6 +1,7 @@
 const std = @import("std");
 const list = @import("commands/list.zig");
 const start = @import("commands/start.zig");
+const test_cmd = @import("commands/test.zig");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -26,7 +27,8 @@ pub fn main() !void {
         }
         try start.run(allocator, args[2]);
     } else if (std.mem.eql(u8, command, "test")) {
-        std.debug.print("TODO: implement test command\n", .{});
+        const problem_query = if (args.len >= 3) args[2] else null;
+        try test_cmd.run(allocator, problem_query);
     } else if (std.mem.eql(u8, command, "--help") or std.mem.eql(u8, command, "-h")) {
         try printHelp();
     } else {

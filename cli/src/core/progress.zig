@@ -60,8 +60,11 @@ pub fn loadProgress(allocator: std.mem.Allocator) !Progress {
     };
     defer file.close();
 
-    const content = try file.readToEndAlloc(allocator, 1024 * 1024);
+    const file_size = (try file.stat()).size;
+    const content = try allocator.alloc(u8, file_size);
     defer allocator.free(content);
+    const bytes_read = try file.read(content);
+    if (bytes_read != file_size) return error.UnexpectedEof;
 
     const parsed = try std.json.parseFromSlice(std.json.Value, allocator, content, .{});
     defer parsed.deinit();

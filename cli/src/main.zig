@@ -1,4 +1,5 @@
 const std = @import("std");
+const list = @import("commands/list.zig");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -16,7 +17,7 @@ pub fn main() !void {
     const command = args[1];
 
     if (std.mem.eql(u8, command, "list")) {
-        std.debug.print("TODO: implement list command\n", .{});
+        try list.run(allocator);
     } else if (std.mem.eql(u8, command, "start")) {
         std.debug.print("TODO: implement start command\n", .{});
     } else if (std.mem.eql(u8, command, "test")) {
